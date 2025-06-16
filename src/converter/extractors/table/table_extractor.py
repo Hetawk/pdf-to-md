@@ -201,7 +201,7 @@ class TableExtractor(BaseExtractor):
             if col_idx == 0:
                 if any(re.search(r'\(.*\d{4}.*\)', val) for val in column_values):
                     headers.append("Reference")
-                elif any(re.search(r'\b[A-Za-z]+(?:[-_][A-Za-z]+)*\b', val) for val in column_values):
+                elif any(re.search(r'\b[A-Za-z]+(?:[-_][A-ZaZ]+)*\b', val) for val in column_values):
                     headers.append("Method")
                 else:
                     headers.append("Approach")
@@ -1679,3 +1679,281 @@ class TableExtractor(BaseExtractor):
         ])
 
         return is_primary_header or is_traditional_header
+
+    # Missing helper methods for PDF-based table extraction
+    def _identify_grid_regions(self, blocks: Dict, page_rect) -> List[List[Dict]]:
+        """Identify potential grid regions from PDF blocks."""
+        # Simplified implementation - group blocks by approximate rows and columns
+        regions = []
+
+        # Extract text blocks
+        text_blocks = []
+        if "blocks" in blocks:
+            for block in blocks["blocks"]:
+                if "lines" in block:
+                    for line in block["lines"]:
+                        if "spans" in line:
+                            for span in line["spans"]:
+                                if span.get("text", "").strip():
+                                    text_blocks.append({
+                                        'text': span["text"],
+                                        'bbox': span.get("bbox", [0, 0, 0, 0]),
+                                        'x': span.get("bbox", [0, 0, 0, 0])[0],
+                                        'y': span.get("bbox", [0, 0, 0, 0])[1]
+                                    })
+
+        # Group blocks into potential table regions
+        if text_blocks:
+            # Sort by y-coordinate (top to bottom)
+            text_blocks.sort(key=lambda b: b['y'])
+
+            # Group into rows based on y-coordinate proximity
+            tolerance = 10  # pixels
+            rows = []
+            current_row = [text_blocks[0]] if text_blocks else []
+
+            for block in text_blocks[1:]:
+                if abs(block['y'] - current_row[0]['y']) <= tolerance:
+                    current_row.append(block)
+                else:
+                    if len(current_row) > 1:  # Only consider rows with multiple elements
+                        rows.append(current_row)
+                    current_row = [block]
+
+            if len(current_row) > 1:
+                rows.append(current_row)
+
+            # If we have multiple rows that look tabular, consider it a region
+            if len(rows) >= 2:
+                regions.append(rows)
+
+        return regions
+
+    def _analyze_grid_structure(self, region: List[List[Dict]]) -> List[List[str]]:
+        """Analyze grid structure to extract table data."""
+        table_data = []
+
+        for row in region:
+            # Sort row elements by x-coordinate (left to right)
+            row.sort(key=lambda b: b['x'])
+            row_data = [block['text'].strip()
+                        for block in row if block['text'].strip()]
+            if row_data:
+                table_data.append(row_data)
+
+        return table_data
+
+    def _validate_table_structure(self, table_data: List[List[str]]) -> bool:
+        """Validate if the extracted data represents a valid table structure."""
+        if not table_data or len(table_data) < 2:
+            return False
+
+        # Check if rows have reasonably consistent column counts
+        col_counts = [len(row) for row in table_data]
+        avg_cols = sum(col_counts) / len(col_counts)
+        consistent_rows = sum(
+            1 for count in col_counts if abs(count - avg_cols) <= 2)
+
+        # 70% of rows should be consistent
+        return consistent_rows >= len(table_data) * 0.7
+
+    def _calculate_table_confidence(self, table_data: List[List[str]]) -> float:
+        """Calculate confidence score for extracted table."""
+        if not table_data:
+            return 0.0
+
+        factors = []
+
+        # Factor 1: Row consistency
+        col_counts = [len(row) for row in table_data]
+        if col_counts:
+            max_cols = max(col_counts)
+            min_cols = min(col_counts)
+            consistency = min_cols / max_cols if max_cols > 0 else 0
+            factors.append(consistency)
+
+        # Factor 2: Content density
+        total_cells = sum(col_counts)
+        non_empty_cells = sum(
+            1 for row in table_data for cell in row if cell.strip())
+        density = non_empty_cells / total_cells if total_cells > 0 else 0
+        factors.append(density)
+
+        # Factor 3: Numerical content (common in tables)
+        numeric_content = sum(1 for row in table_data for cell in row
+                              if re.search(r'\d+\.?\d*', cell))
+        numeric_ratio = numeric_content / total_cells if total_cells > 0 else 0
+        factors.append(min(numeric_ratio * 2, 1.0))  # Cap at 1.0
+
+        return sum(factors) / len(factors) if factors else 0.5
+
+    def _get_structured_text_lines(self, page) -> List[Dict]:
+        """Extract structured text lines from page."""
+        lines = []
+
+        try:
+            blocks = page.get_text("dict")
+            if "blocks" in blocks:
+                for block in blocks["blocks"]:
+                    if "lines" in block:
+                        for line in block["lines"]:
+                            line_text = ""
+                            line_bbox = None
+
+                            if "spans" in line:
+                                for span in line["spans"]:
+                                    if span.get("text", "").strip():
+                                        line_text += span["text"] + " "
+                                        if line_bbox is None:
+                                            line_bbox = span.get(
+                                                "bbox", [0, 0, 0, 0])
+
+                            if line_text.strip():
+                                lines.append({
+                                    'text': line_text.strip(),
+                                    'bbox': line_bbox or [0, 0, 0, 0],
+                                    'y': line_bbox[1] if line_bbox else 0
+                                })
+        except Exception as e:
+            self.logger.warning(
+                f"Failed to extract structured text lines: {e}")
+
+        return lines
+
+    def _find_aligned_text_regions(self, text_lines: List[Dict]) -> List[List[Dict]]:
+        """Find regions of aligned text that might be tables."""
+        regions = []
+
+        if not text_lines:
+            return regions
+
+        # Sort lines by y-coordinate
+        text_lines.sort(key=lambda l: l['y'])
+
+        # Group lines that might form a table
+        current_region = []
+        prev_y = None
+
+        for line in text_lines:
+            # Check if this line has multiple "words" separated by significant spaces
+            text = line['text']
+            if self._looks_like_table_row(text):
+                # Lines close together
+                if prev_y is None or abs(line['y'] - prev_y) < 50:
+                    current_region.append(line)
+                else:
+                    if len(current_region) >= 3:  # Minimum rows for a table
+                        regions.append(current_region)
+                    current_region = [line]
+                prev_y = line['y']
+            else:
+                if len(current_region) >= 3:
+                    regions.append(current_region)
+                current_region = []
+                prev_y = None
+
+        # Add final region
+        if len(current_region) >= 3:
+            regions.append(current_region)
+
+        return regions
+
+    def _parse_aligned_table(self, region: List[Dict]) -> List[List[str]]:
+        """Parse aligned text region into table data."""
+        table_data = []
+
+        for line_dict in region:
+            text = line_dict['text']
+            # Use existing text parsing logic
+            if self._looks_like_table_row(text):
+                # Split by multiple spaces or tabs
+                if '\t' in text:
+                    row_data = [cell.strip()
+                                for cell in text.split('\t') if cell.strip()]
+                else:
+                    row_data = [cell.strip() for cell in re.split(
+                        r'\s{2,}', text) if cell.strip()]
+
+                if row_data:
+                    table_data.append(row_data)
+
+        return table_data
+
+    def _calculate_alignment_confidence(self, region: List[Dict]) -> float:
+        """Calculate confidence for aligned text region."""
+        if not region:
+            return 0.0
+
+        # Simple confidence based on consistency of content
+        table_data = self._parse_aligned_table(region)
+        return self._calculate_table_confidence(table_data)
+
+    def _extract_table_lines(self, drawings: List) -> List[Dict]:
+        """Extract lines that might form table borders."""
+        lines = []
+
+        # Look for horizontal and vertical lines in drawings
+        for drawing in drawings:
+            if drawing.get('type') == 'l':  # Line
+                start = drawing.get('start', [0, 0])
+                end = drawing.get('end', [0, 0])
+
+                # Determine if horizontal or vertical
+                is_horizontal = abs(start[1] - end[1]) < 5
+                is_vertical = abs(start[0] - end[0]) < 5
+
+                if is_horizontal or is_vertical:
+                    lines.append({
+                        'start': start,
+                        'end': end,
+                        'horizontal': is_horizontal,
+                        'vertical': is_vertical
+                    })
+
+        return lines
+
+    def _build_grid_from_lines(self, lines: List[Dict]) -> Optional[Dict]:
+        """Build grid structure from detected lines."""
+        if not lines:
+            return None
+
+        # Group horizontal and vertical lines
+        h_lines = [l for l in lines if l['horizontal']]
+        v_lines = [l for l in lines if l['vertical']]
+
+        if len(h_lines) >= 2 and len(v_lines) >= 2:
+            # Find intersections to form grid
+            return {
+                'horizontal_lines': h_lines,
+                'vertical_lines': v_lines,
+                'rows': len(h_lines) - 1,
+                'cols': len(v_lines) - 1
+            }
+
+        return None
+
+    def _extract_text_from_grid(self, page, grid_structure: Dict) -> List[List[str]]:
+        """Extract text content from grid cells."""
+        # Simplified implementation - just return empty for now
+        # In a full implementation, this would extract text within each grid cell
+        return []
+
+    def _estimate_column_count_from_words(self, lines: List[str]) -> int:
+        """Estimate reasonable column count from word distribution."""
+        if not lines:
+            return 2
+
+        word_counts = [len(line.split()) for line in lines]
+        if word_counts:
+            avg_words = sum(word_counts) / len(word_counts)
+            # Estimate columns based on average word count
+            if avg_words <= 4:
+                return 2
+            elif avg_words <= 8:
+                return 3
+            elif avg_words <= 12:
+                return 4
+            else:
+                return min(5, int(avg_words / 3))
+
+        return 2

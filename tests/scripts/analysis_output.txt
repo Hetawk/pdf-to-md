@@ -1,0 +1,214 @@
+🔍 Comprehensive Analysis of PDF-to-Markdown Conversion Results
+======================================================================
+Found 15 markdown files to analyze
+
+Analyzing: Adversarial attacks and defenses on AI in medical imaging informatics- A survey.md
+Analyzing: Attention-based generative adversarial network in medical imaging- A narrative review.md
+Analyzing: Azad_Beyond_Self-Attention_Deformable_Large_Kernel_Attention_for_Medical_Image_Segmentation_WACV_2024_paper.md
+Analyzing: Characterizing adversarial subspaces using local intrinsic dimensionality.md
+Analyzing: Computationally Efficient Diffusion Models in Medical Imaging- A Comprehensive Review.md
+Analyzing: Defending_Against_Adversarial_Attacks_On_Medical_Imaging_Ai_System_Classification_Or_Detection.md
+Analyzing: Enhancing resilience against adversarial attacks in medical imaging using advanced feature transformation training.md
+Analyzing: How Does Pruning Impact Long-Tailed Multi-Label Medical Image Classifiers?.md
+Analyzing: MedFuseNet - An attention-based multimodal deep learning model for visual question answering in the medical domain.md
+Analyzing: Medical Physics - 2021 - Chen - Enhancing adversarial defense for medical image analysis systems with pruning and attention.md
+Analyzing: Robustness in deep learning models for medical diagnostics - security and adversarial challenges towards robust AI applications.md
+Analyzing: Structured Model Pruning for Efficient Inference in Computational Pathology.md
+Analyzing: Structured_Pruning_and_Quantization_for_Learned_Image_Compression.md
+Analyzing: Towards Transferable Targeted Adversarial Examples.md
+Analyzing: Transformers in medical image analysis.md
+
+======================================================================
+📊 SUMMARY STATISTICS
+======================================================================
+Total files analyzed: 15
+Total content size: 2090.3 KB
+Average file size: 139.4 KB
+Total sections: 38
+Total images: 118
+Total citations: 5333
+Total tables found: 1895
+Valid tables: 103
+Table validity rate: 5.4%
+
+File size distribution:
+  Min: 41.6 KB
+  Max: 578.1 KB
+  Median: 82.2 KB
+
+⚠️  Quality Issues Summary:
+  Too few sections: 7 files
+  Low table validity rate: 0.0%: 3 files
+  Low table validity rate: 3.1%: 2 files
+  Low table validity rate: 9.5%: 2 files
+  Low table validity rate: 4.8%: 1 files
+  Low table validity rate: 13.2%: 1 files
+  Low table validity rate: 1.1%: 1 files
+  Low table validity rate: 1.2%: 1 files
+  Low table validity rate: 4.3%: 1 files
+  Low table validity rate: 4.5%: 1 files
+  Low table validity rate: 2.2%: 1 files
+  Low table validity rate: 5.9%: 1 files
+
+======================================================================
+📋 DETAILED FILE ANALYSIS
+======================================================================
+
+📄 Robustness in deep learning models for medical diagnostics - security and adversarial challenges towards robust AI applications.md
+   Size: 578.1 KB | Sections: 2 | Tables: 291 | Valid: 30
+   ⚠️  Issues: Too few sections, Low table validity rate: 9.5%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 261
+      Table 1: Too few rows (2x6)
+      Table 2: Missing header separator (6x2)
+      Table 3: Too few rows (2x2)
+      ... and 258 more
+
+📄 Computationally Efficient Diffusion Models in Medical Imaging- A Comprehensive Review.md
+   Size: 319.9 KB | Sections: 3 | Tables: 315 | Valid: 32
+   ⚠️  Issues: Low table validity rate: 9.5%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 283
+      Table 1: Too few rows (2x2)
+      Table 3: Too few columns (2x1)
+      Table 6: Too few columns (13x1)
+      ... and 280 more
+
+📄 Transformers in medical image analysis.md
+   Size: 248.4 KB | Sections: 3 | Tables: 409 | Valid: 0
+   ⚠️  Issues: Low table validity rate: 0.0%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 409
+      Table 1: Too few rows (2x2)
+      Table 3: Too few columns (9x1)
+      Table 8: Too few columns (9x1)
+      ... and 406 more
+
+📄 Attention-based generative adversarial network in medical imaging- A narrative review.md
+   Size: 128.0 KB | Sections: 3 | Tables: 84 | Valid: 12
+   ⚠️  Issues: Low table validity rate: 13.2%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 72
+      Table 1: Too few rows (2x2)
+      Table 2: Missing header separator (2x2)
+      Table 3: Too few rows (2x3)
+      ... and 69 more
+
+📄 Medical Physics - 2021 - Chen - Enhancing adversarial defense for medical image analysis systems with pruning and attention.md
+   Size: 108.5 KB | Sections: 3 | Tables: 153 | Valid: 7
+   ⚠️  Issues: Low table validity rate: 3.1%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 146
+      Table 14: Too few rows (2x2)
+      Table 15: Too few columns (3x1)
+      Table 16: Too few rows (2x2)
+      ... and 143 more
+
+📄 MedFuseNet - An attention-based multimodal deep learning model for visual question answering in the medical domain.md
+   Size: 99.4 KB | Sections: 3 | Tables: 41 | Valid: 3
+   ⚠️  Issues: Low table validity rate: 4.5%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 38
+      Table 3: Too few rows (2x2)
+      Table 4: Too few columns (2x1)
+      Table 5: Too few columns (8x1)
+      ... and 35 more
+
+📄 Adversarial attacks and defenses on AI in medical imaging informatics- A survey.md
+   Size: 99.3 KB | Sections: 3 | Tables: 39 | Valid: 2
+   ⚠️  Issues: Low table validity rate: 4.8%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 37
+      Table 1: Too few rows (2x2)
+      Table 2: Too few columns (5x1)
+      Table 3: Too few rows (2x2)
+      ... and 34 more
+
+📄 Azad_Beyond_Self-Attention_Deformable_Large_Kernel_Attention_for_Medical_Image_Segmentation_WACV_2024_paper.md
+   Size: 82.2 KB | Sections: 2 | Tables: 125 | Valid: 2
+   ⚠️  Issues: Too few sections, Low table validity rate: 1.1%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 123
+      Table 1: Too few rows (2x3)
+      Table 2: Too few rows (2x2)
+      Table 4: Too few columns (2x1)
+      ... and 120 more
+
+📄 Characterizing adversarial subspaces using local intrinsic dimensionality.md
+   Size: 78.0 KB | Sections: 2 | Tables: 54 | Valid: 2
+   ⚠️  Issues: Too few sections, Low table validity rate: 3.1%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 52
+      Table 1: Too few rows (2x3)
+      Table 4: Too few columns (7x1)
+      Table 5: Too few columns (5x1)
+      ... and 49 more
+
+📄 Structured Model Pruning for Efficient Inference in Computational Pathology.md
+   Size: 76.6 KB | Sections: 2 | Tables: 81 | Valid: 2
+   ⚠️  Issues: Too few sections, Low table validity rate: 2.2%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 79
+      Table 1: Too few rows (2x2)
+      Table 2: Too few columns (2x1)
+      Table 3: Too few rows (2x3)
+      ... and 76 more
+
+📄 Towards Transferable Targeted Adversarial Examples.md
+   Size: 63.2 KB | Sections: 2 | Tables: 69 | Valid: 0
+   ⚠️  Issues: Too few sections, Low table validity rate: 0.0%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 69
+      Table 1: Too few rows (2x2)
+      Table 3: Too few rows (2x2)
+      Table 4: Too few columns (2x1)
+      ... and 66 more
+
+📄 Enhancing resilience against adversarial attacks in medical imaging using advanced feature transformation training.md
+   Size: 62.2 KB | Sections: 3 | Tables: 49 | Valid: 0
+   ⚠️  Issues: Low table validity rate: 0.0%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 49
+      Table 1: Too few rows (2x2)
+      Table 2: Too few columns (2x1)
+      Table 3: Too few columns (4x1)
+      ... and 46 more
+
+📄 Structured_Pruning_and_Quantization_for_Learned_Image_Compression.md
+   Size: 60.2 KB | Sections: 2 | Tables: 74 | Valid: 7
+   ⚠️  Issues: Too few sections, Low table validity rate: 5.9%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 67
+      Table 1: Too few rows (2x2)
+      Table 2: Too few columns (2x1)
+      Table 3: Too few rows (2x2)
+      ... and 64 more
+
+📄 How Does Pruning Impact Long-Tailed Multi-Label Medical Image Classifiers?.md
+   Size: 44.7 KB | Sections: 3 | Tables: 53 | Valid: 3
+   ⚠️  Issues: Low table validity rate: 4.3%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 50
+      Table 1: Too few rows (2x3)
+      Table 3: Too few rows (2x2)
+      Table 4: Too few columns (2x1)
+      ... and 47 more
+
+📄 Defending_Against_Adversarial_Attacks_On_Medical_Imaging_Ai_System_Classification_Or_Detection.md
+   Size: 41.6 KB | Sections: 2 | Tables: 58 | Valid: 1
+   ⚠️  Issues: Too few sections, Low table validity rate: 1.2%
+   📊 Metadata completeness: 0.0%
+   🔍 Problematic tables: 57
+      Table 1: Too few rows (2x2)
+      Table 2: Too few columns (2x1)
+      Table 3: Too few rows (2x2)
+      ... and 54 more
+
+======================================================================
+🎯 RECOMMENDATIONS
+======================================================================
+• Table extraction could be improved - consider refining regex patterns
+• 15 files have quality issues that should be reviewed
+
+✅ Overall conversion quality appears needs improvement
+📈 Success rate: 0.0%

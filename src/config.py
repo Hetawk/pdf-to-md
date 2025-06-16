@@ -72,6 +72,42 @@ class Config:
         'min_text_extraction_ratio': 0.1,
         'min_table_confidence': 0.6,
         'min_image_size': 50,
+
+        # Conversion Pipeline Strategy (HYBRID ENABLED)
+        'conversion_strategy': 'hybrid',  # 'direct', 'hybrid', 'auto'
+        'pdf_to_word_enabled': True,  # Enabled - cv2 issue resolved
+        'word_to_markdown_enabled': True,  # Enabled - cv2 issue resolved
+        'use_pandoc_fallback': True,
+
+        # PDF to Word conversion settings (ENHANCED FOR MULTI-COLUMN)
+        'pdf2docx_settings': {
+            'start_page': 0,
+            'end_page': None,
+            'image_resolution': 200,  # Higher resolution for better text recognition
+            'cpu_count': None,  # Use all available CPUs
+            'password': None,
+            # Enhanced multi-column settings
+            'multi_column_detection': True,
+            'column_overlap_threshold': 0.1,
+            'text_flow_analysis': True
+        },
+
+        # Word processing settings (NEW)
+        'word_processing': {
+            'preserve_styles': True,
+            'extract_embedded_objects': True,
+            'handle_tables_enhanced': True,
+            'process_headers_footers': True
+        },
+
+        # Markdown generation settings (NEW)
+        'markdown_options': {
+            'convert_word_tables': True,
+            'preserve_formatting': True,
+            'extract_media': True,
+            'media_dir': 'media',
+            'table_format': 'github'  # 'github', 'grid', 'simple'
+        },
     }
 
     def __init__(self, config_data: Optional[Dict[str, Any]] = None):

@@ -15,6 +15,17 @@ from .extractors import (TextExtractor, ImageExtractor, TableExtractor,
 from .processors import MetadataProcessor, ContentProcessor
 from .utils import create_conversion_report, validate_conversion_quality
 
+# Try to import hybrid converter - optional dependency
+try:
+    from .converters.hybrid_converter import HybridPDFConverter
+    HYBRID_CONVERTER_AVAILABLE = True
+    print("✅ Hybrid converter available (PDF → Word → Markdown)")
+except ImportError as e:
+    HYBRID_CONVERTER_AVAILABLE = False
+    HybridPDFConverter = None
+    print(f"⚠️  Hybrid converter not available: {e}")
+    print("📝 Falling back to direct PDF → Markdown conversion")
+
 
 class PDFToMarkdownConverter:
     """Main converter class for PDF to Markdown conversion."""
@@ -40,6 +51,18 @@ class PDFToMarkdownConverter:
         self.bib_enricher = BibliographicEnricher(
             self.config) if self.config.get('enrich_metadata', True) else None
 
+        # Initialize hybrid converter for PDF → Word → Markdown pipeline (optional)
+        if HYBRID_CONVERTER_AVAILABLE and HybridPDFConverter:
+            try:
+                self.hybrid_converter = HybridPDFConverter(
+                    self.config.to_dict())
+            except Exception as e:
+                self.logger.warning(
+                    f"Failed to initialize hybrid converter: {e}")
+                self.hybrid_converter = None
+        else:
+            self.hybrid_converter = None
+
     def setup_logging(self):
         """Setup logging for conversion process."""
         # Create logs directory
@@ -60,7 +83,7 @@ class PDFToMarkdownConverter:
         self.logger = logging.getLogger(__name__)
 
     def convert_pdf_to_markdown(self, pdf_path: str, output_path: Optional[str] = None) -> bool:
-        """Convert a single PDF to Markdown."""
+        """Convert a single PDF to Markdown using the configured strategy."""
         if output_path is None:
             # Create out/md-json directory and save markdown files there
             out_dir = Path("out")
@@ -68,11 +91,136 @@ class PDFToMarkdownConverter:
             md_json_dir.mkdir(parents=True, exist_ok=True)
             output_path = md_json_dir / Path(pdf_path).with_suffix('.md').name
 
+        # Choose conversion strategy
+        strategy = self._choose_conversion_strategy(pdf_path)
+
+        if strategy == 'hybrid':
+            return self._convert_using_hybrid_pipeline(pdf_path, output_path)
+        else:
+            return self._convert_using_direct_method(pdf_path, output_path)
+
+    def _choose_conversion_strategy(self, pdf_path: str) -> str:
+        """
+        Choose the best conversion strategy based on configuration and document characteristics.
+
+        Returns:
+            'hybrid' for PDF → Word → Markdown pipeline
+            'direct' for direct PDF → Markdown conversion
+        """
+        # Check configuration preference
+        strategy = self.config.get('conversion_strategy', 'direct')
+
+        if strategy == 'hybrid':
+            # Verify hybrid converter is available
+            if self.hybrid_converter and self.hybrid_converter.can_convert(pdf_path):
+                self.logger.info(
+                    f"Using hybrid PDF → Word → Markdown conversion")
+                return 'hybrid'
+            else:
+                self.logger.warning(
+                    "Hybrid conversion requested but not available, falling back to direct")
+                return 'direct'
+        elif strategy == 'auto':
+            # Auto-detect best strategy based on document characteristics
+            return self._auto_detect_strategy(pdf_path)
+        else:
+            # Default to direct conversion
+            self.logger.info(f"Using direct PDF → Markdown conversion")
+            return 'direct'
+
+    def _auto_detect_strategy(self, pdf_path: str) -> str:
+        """Auto-detect the best conversion strategy based on document analysis."""
+        try:
+            # Quick analysis of PDF characteristics
+            doc = fitz.open(pdf_path)
+            page_count = len(doc)
+
+            # Sample first few pages for analysis
+            sample_pages = min(3, page_count)
+            has_complex_tables = False
+            has_multi_column = False
+
+            for page_num in range(sample_pages):
+                page = doc[page_num]
+
+                # Check for complex tables
+                tables = page.find_tables()
+                if tables and len(tables) > 0:
+                    for table in tables:
+                        if table.row_count > 5 or table.col_count > 4:
+                            has_complex_tables = True
+                            break
+
+                # Check for multi-column layout
+                text_blocks = page.get_text("dict")["blocks"]
+                if len(text_blocks) > 10:  # Heuristic for complex layout
+                    has_multi_column = True
+
+                if has_complex_tables and has_multi_column:
+                    break
+
+            doc.close()
+
+            # Decision logic
+            if has_complex_tables or has_multi_column:
+                if self.hybrid_converter and self.hybrid_converter.can_convert(pdf_path):
+                    self.logger.info(
+                        "Auto-detected complex document - using hybrid conversion")
+                    return 'hybrid'
+                else:
+                    self.logger.info(
+                        "Complex document detected but hybrid unavailable - using direct")
+                    return 'direct'
+            else:
+                self.logger.info(
+                    "Simple document detected - using direct conversion")
+                return 'direct'
+
+        except Exception as e:
+            self.logger.warning(
+                f"Auto-detection failed: {e}, using direct conversion")
+            return 'direct'
+
+    def _convert_using_hybrid_pipeline(self, pdf_path: str, output_path: str) -> bool:
+        """Convert PDF using the hybrid PDF → Word → Markdown pipeline."""
+        try:
+            self.logger.info(f"Starting hybrid conversion: {pdf_path}")
+
+            # Use hybrid converter
+            result_path, conversion_report = self.hybrid_converter.convert(
+                pdf_path,
+                output_path,
+                cleanup_intermediate=self.config.get(
+                    'cleanup_temp_files', True)
+            )
+
+            # Save conversion report
+            if self.config.get('create_reports', True):
+                report_path = Path(output_path).with_suffix(
+                    '.hybrid_report.json')
+                with open(report_path, 'w', encoding='utf-8') as f:
+                    json.dump(conversion_report, f, indent=2,
+                              ensure_ascii=False, default=str)
+                self.logger.info(
+                    f"Hybrid conversion report saved: {report_path}")
+
+            self.logger.info(
+                f"Hybrid conversion completed successfully: {result_path}")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Hybrid conversion failed: {e}")
+            # Fall back to direct conversion if hybrid fails
+            self.logger.info("Falling back to direct conversion method")
+            return self._convert_using_direct_method(pdf_path, output_path)
+
+    def _convert_using_direct_method(self, pdf_path: str, output_path: str) -> bool:
+        """Convert PDF using the original direct method"""
         # Always use out directory for images regardless of markdown output location
         output_dir = Path("out")
 
         try:
-            self.logger.info(f"Starting conversion: {pdf_path}")
+            self.logger.info(f"Starting direct conversion: {pdf_path}")
 
             # Check file accessibility and size
             if not Path(pdf_path).exists():

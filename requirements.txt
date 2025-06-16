@@ -1,29 +1,59 @@
+# ========================================
+# PDF-to-Markdown Converter Requirements
+# ========================================
+
 # Core PDF processing
-PyMuPDF>=1.23.0
+PyMuPDF>=1.23.0                    # Primary PDF processing library
 
-# OCR support
-pytesseract>=0.3.10
-opencv-python>=4.8.0
-Pillow>=10.0.0
+# Enhanced PDF to Word conversion pipeline
+pdf2docx>=0.5.6                    # PDF to Word conversion (high fidelity)
+python-docx>=0.8.11                # Word document processing
+docx2python>=2.6.0                 # Enhanced Word document extraction
 
-# Data processing
-numpy>=1.24.0
-pandas>=2.0.0
+# Word to Markdown conversion
+mammoth>=1.6.0                     # Clean Word to Markdown conversion
+markdownify>=0.11.6                # HTML to Markdown conversion
 
-# Networking and APIs
-requests>=2.31.0
+# OCR support for scanned PDFs
+pytesseract>=0.3.10                # OCR text extraction
+opencv-python-headless>=4.8.0      # Image processing for OCR (headless version for pdf2docx)
+Pillow>=10.0.0                     # Image manipulation
+pdf2image>=1.17.0                   # Convert PDF pages to images
 
-# Progress bars
-tqdm>=4.65.0
+# Data processing and analysis
+numpy<2.0                          # Numerical computing
+pandas>=2.0.0                      # Data manipulation and analysis
+scipy>=1.11.0                      # Scientific computing
 
-# BibTeX processing
-bibtexparser>=1.4.0
+# Text and content processing
+nltk>=3.8.1                        # Natural language processing
+beautifulsoup4>=4.12.0             # HTML/XML parsing
+lxml>=4.9.3                        # XML/HTML parser
 
-# Text processing
-python-docx>=0.8.11
+# Networking and APIs for metadata enrichment
+requests>=2.31.0                   # HTTP requests
+urllib3>=2.0.0                     # HTTP client
 
-# Optional dependencies for enhanced functionality
-# Uncomment if needed:
-# scikit-image>=0.21.0  # For advanced image processing
-# matplotlib>=3.7.0     # For visualization
-# seaborn>=0.12.0       # For enhanced plotting
+# Progress and logging
+tqdm>=4.65.0                       # Progress bars
+colorlog>=6.7.0                    # Colored logging
+
+# Configuration and data formats
+PyYAML>=6.0.1                      # YAML configuration files
+toml>=0.10.2                       # TOML configuration support
+bibtexparser>=1.4.0                # BibTeX processing
+
+# File and path utilities
+pathvalidate>=3.1.0                # Path validation
+
+# Development and testing (install separately)
+# pytest>=7.4.0                    # Testing framework
+# pytest-cov>=4.1.0                # Coverage reporting
+# black>=23.0.0                    # Code formatting
+# flake8>=6.0.0                    # Linting
+# mypy>=1.5.0                      # Type checking
+
+# Optional external dependencies (require manual installation):
+# - Tesseract OCR engine: macOS: brew install tesseract, Ubuntu: apt-get install tesseract-ocr
+# - Pandoc: For advanced document conversion (optional fallback)
+# - LibreOffice: For alternative conversion pipeline (optional)

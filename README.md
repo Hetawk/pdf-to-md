@@ -20,22 +20,40 @@ git clone https://github.com/Hetawk/pdf-to-md.git
 cd pdf-to-md
 ```
 
-2. Install required dependencies:
+2. Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Setup
-
-Create the following directories in your project root for input files:
+4. Install optional dependencies for full functionality:
 
 ```bash
-mkdir pdf docx
+pip install pytesseract Pillow opencv-python pandas numpy
 ```
 
-- `pdf/`: Place your PDF files here for conversion
-- `docx/`: Place your DOCX files here for conversion (if needed)
+5. (Optional) Install Tesseract OCR engine for OCR functionality:
+   - macOS: `brew install tesseract` (if available)
+   - Ubuntu/Debian: `sudo apt-get install tesseract-ocr`
+   - Windows: Download from [GitHub releases](https://github.com/UB-Mannheim/tesseract/wiki)
+   - Manual installation: The converter will work without OCR, just with reduced functionality
+
+## Setup
+
+Create the following directory in your project root for input files:
+
+```bash
+mkdir documents
+```
+
+- `documents/`: Place your PDF and DOCX files here for conversion
 
 ## Usage
 
@@ -60,9 +78,55 @@ The converter supports various configuration options through the main script. Yo
 
 ```bash
 # Convert an academic paper
-python pdf-to-md.py pdf/academic_paper.pdf
+python pdf-to-md.py documents/academic_paper.pdf
 
-# The output will be generated in the out/ directory
+# The output will be generated in the out/ directory with structured subdirectories
+```
+
+## Quick Start
+
+1. **Clone and setup the project:**
+
+```bash
+git clone https://github.com/Hetawk/pdf-to-md.git
+cd pdf-to-md
+./setup.sh
+```
+
+2. **Activate the virtual environment:**
+
+```bash
+source .venv/bin/activate
+```
+
+3. **Add documents and convert:**
+
+```bash
+# Add PDF/DOCX files to documents/
+cp your-paper.pdf documents/
+
+# Convert all documents
+python pdf-to-md.py
+
+# Or convert a specific file
+python pdf-to-md.py documents/your-paper.pdf
+```
+
+4. **Check the results in the `out/` directory**
+
+## Project Structure
+
+For detailed information about the project architecture, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+```
+pdf-to-md/
+├── README.md           # This file
+├── setup.sh           # Quick setup script
+├── pdf-to-md.py       # Main converter
+├── documents/         # Your input files
+├── out/              # Generated output
+├── src/              # Source code
+└── tests/            # Tests and utilities
 ```
 
 ## Architecture
@@ -150,3 +214,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues, questions, or contributions, please open an issue on the GitHub repository.
+
+## Documentation
+
+Detailed project documentation and architecture information can be found in the `docs/` directory (auto-generated during development).

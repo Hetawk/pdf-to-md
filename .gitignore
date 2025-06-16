@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Virtual environment
+.venv/
+venv/
+
 # Distribution / packaging
 .Python
 build/
@@ -136,6 +140,9 @@ dmypy.json
 out/
 output/
 
+# Documentation (can be regenerated)
+docs/
+
 # Test files
 *test*.py
 test_*.py
@@ -145,15 +152,27 @@ minimal_test.py
 simple_debug.py
 backup.py
 
-# Input directories (mentioned in README for user setup)
-pdf/
-docx/
+# Input directories (users should add their own files)
+documents/
+*.pdf
+*.docx
+*.doc
 
 # IDE files
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.env
 *~
 
 # OS generated files
